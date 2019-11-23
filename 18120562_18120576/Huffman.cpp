@@ -17,7 +17,7 @@ Node* createHuffmanTree(vector <char> character, vector <int> frequence)
 	}
 
 
-	while ( Tree.size() > 1)
+	while (Tree.size() > 1)
 	{
 		//Ket hop 2 node co tan so thap nhat (2 phan tu dau tien cua bang tan so) thanh node moi co 2 con la 2 node cu
 		Node *p = new Node;
@@ -28,7 +28,7 @@ Node* createHuffmanTree(vector <char> character, vector <int> frequence)
 
 		//Xoa 2 phan tu dau trong Tree (2 phan tu da duoc ket hop)
 		Tree.erase(Tree.begin(), Tree.begin() + 2);
-		
+
 		//Chen node moi tao vao Tree sao cho Tree van theo thu tu tang dan theo tan so 
 		Tree.push_back(p);
 		for (int i = 0; i < Tree.size() - 1; i++)
@@ -50,10 +50,10 @@ Node* createHuffmanTree(vector <char> character, vector <int> frequence)
 
 void createHuffmanCodeTable(Node* Tree, vector <HuffmanCode> &Table, string code)
 {
-	if (Tree->left != NULL ||Tree->right != NULL)
+	if (Tree->left != NULL || Tree->right != NULL)
 	{
 		//Neu qua trai thi them 0 vao ma
-		createHuffmanCodeTable(Tree->left , Table, code + "0");
+		createHuffmanCodeTable(Tree->left, Table, code + "0");
 		//Neu qua phai thi them 1 vao ma
 		createHuffmanCodeTable(Tree->right, Table, code + "1");
 	}
