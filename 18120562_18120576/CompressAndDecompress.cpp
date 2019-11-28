@@ -28,17 +28,29 @@ bool createFrequenceTable(string str, vector <char> &character, vector <int> &fr
 		return false;
 
 	//Tao bang tan so
+	vector <int> hash;
+	hash.resize(256);
+	for (int i = 0; i < hash.size(); i++)
+		hash[i] = 0;
+
 	for (int i = 0; i < str.length(); i++)
 	{
-		//Neu ky tu chua co trong bang thi them vao, neu da co thi tang tan so len 1
-		if (findElementOfVector(character, str[i]) == -1)
-		{
-			character.push_back(str[i]);
-			frequence.push_back(1);
-		}
-		else
-			frequence[findElementOfVector(character, str[i])]++;
+		hash[int(str[i]) + 128]++;
 	}
+
+	for (int i = 0; i < hash.size(); i++)
+	{
+		if (hash[i] != 0)
+		{
+			char c = char(i - 128);
+			character.push_back(c);
+			frequence.push_back(hash[i]);
+		}
+	}
+
+
+
+
 
 	//Sap xep lai bang tan so theo thu tu tang dan theo tan so (frequence)
 	for (int i = 0; i < frequence.size() - 1; i++)
@@ -119,6 +131,7 @@ bool CompressFile(string infilename, string outfilename)
 	//Tao bang tan so
 	if (!createFrequenceTable(str, character, frequence))
 		return false;
+
 	//Tao cay huffman
 	Node* HuffmanTree = createHuffmanTree(character, frequence);
 
@@ -131,17 +144,23 @@ bool CompressFile(string infilename, string outfilename)
 		string code = "";
 		createHuffmanCodeTable(HuffmanTree, CodeTable, code);
 
+		cout << "Huffman code successful\n";
 		//Tao chuoi nhi phan ma hoa file
 		string str_code = "";
+
+		vector <string> hash;
+		hash.resize(256);
+
+		for (int i = 0; i < CodeTable.size(); i++)
+		{
+			hash[int(CodeTable[i].c) + 128] = CodeTable[i].code;
+		}
+
 		for (int i = 0; i < str.length(); i++)
 		{
-			for (int j = 0; j < CodeTable.size(); j++)
-				if (str[i] == CodeTable[j].c)
-				{
-					str_code += CodeTable[j].code;
-					break;
-				}
+			str_code += hash[int(str[i]) + 128];
 		}
+
 
 		FILE* outfile;
 		fopen_s(&outfile, outfilename.c_str(), "wb");
@@ -171,8 +190,8 @@ bool CompressFile(string infilename, string outfilename)
 		while (temp * 8 < str_code.length())
 		{
 			string str_temp = "";
-			for (int i = temp * 8; i < temp * 8 + 8; i++)
-				str_temp += str_code[i];
+
+			str_temp += str_code.substr(temp * 8, 8);
 			unsigned char decimal = BinaryToDecimal(str_temp);
 			fwrite(&decimal, sizeof(unsigned char), 1, outfile);
 			temp++;
@@ -313,15 +332,20 @@ bool CompressFolder(string path, string outfilename)
 
 			//Tao chuoi nhi phan ma hoa file
 			string str_code = "";
+
+			vector <string> hash;
+			hash.resize(256);
+
+			for (int i = 0; i < CodeTable.size(); i++)
+			{
+				hash[int(CodeTable[i].c) + 128] = CodeTable[i].code;
+			}
+
 			for (int i = 0; i < str.length(); i++)
 			{
-				for (int j = 0; j < CodeTable.size(); j++)
-					if (str[i] == CodeTable[j].c)
-					{
-						str_code += CodeTable[j].code;
-						break;
-					}
+				str_code += hash[int(str[i]) + 128];
 			}
+
 
 
 			//Ghi bang tan so vao file
@@ -347,8 +371,7 @@ bool CompressFolder(string path, string outfilename)
 			while (temp * 8 < str_code.length())
 			{
 				string str_temp = "";
-				for (int i = temp * 8; i < temp * 8 + 8; i++)
-					str_temp += str_code[i];
+				str_temp += str_code.substr(temp * 8, 8);
 				unsigned char decimal = BinaryToDecimal(str_temp);
 				fwrite(&decimal, sizeof(unsigned char), 1, outfile);
 				temp++;
