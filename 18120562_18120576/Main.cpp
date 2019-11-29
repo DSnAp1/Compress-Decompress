@@ -328,8 +328,8 @@ void Decompress(string path, string decompressPath)
 
 int main()
 {
-		Compress("D:\\a", "D:\\nen.myzip");
-		Decompress("D:\\nen.myzip", "D:\\ak");
+		Compress("E:\\Nam 2\\TH CTDL\\GitHub\\Compress-Decompress\\a", "E:\\Nam 2\\TH CTDL\\GitHub\\Compress-Decompress\\nen.myzip");
+		Decompress("E:\\Nam 2\\TH CTDL\\GitHub\\Compress-Decompress\\nen.myzip", "E:\\Nam 2\\TH CTDL\\GitHub\\Compress-Decompress\\ak");
 
 		system("pause");
 		return 0;

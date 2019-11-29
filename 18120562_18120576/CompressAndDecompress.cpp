@@ -19,8 +19,6 @@ void mySwap(T& a, T&b)
 	b = temp;
 }
 
-
-
 bool createFrequenceTable(string str, vector <char> &character, vector <int> &frequence)
 {
 	//Neu chuoi rong tra ve false
@@ -30,9 +28,6 @@ bool createFrequenceTable(string str, vector <char> &character, vector <int> &fr
 	//Tao bang tan so
 	vector <int> hash;
 	hash.resize(256);
-	for (int i = 0; i < hash.size(); i++)
-		hash[i] = 0;
-
 	for (int i = 0; i < str.length(); i++)
 	{
 		hash[int(str[i]) + 128]++;
@@ -47,10 +42,6 @@ bool createFrequenceTable(string str, vector <char> &character, vector <int> &fr
 			frequence.push_back(hash[i]);
 		}
 	}
-
-
-
-
 
 	//Sap xep lai bang tan so theo thu tu tang dan theo tan so (frequence)
 	for (int i = 0; i < frequence.size() - 1; i++)
@@ -67,6 +58,7 @@ bool createFrequenceTable(string str, vector <char> &character, vector <int> &fr
 
 unsigned char BinaryToDecimal(string str)
 {
+
 	unsigned char S = 0;
 	int temp = 0;
 	for (int i = str.length() - 1; i >= 0; i--)
@@ -75,6 +67,7 @@ unsigned char BinaryToDecimal(string str)
 			S += pow(2, temp);
 		temp++;
 	}
+
 	return S;
 }
 
@@ -128,6 +121,7 @@ bool CompressFile(string infilename, string outfilename)
 	vector <int> frequence; //Tan so tuong ung
 
 	string str = ReadFile(infilename);
+
 	//Tao bang tan so
 	if (!createFrequenceTable(str, character, frequence))
 		return false;
@@ -144,7 +138,6 @@ bool CompressFile(string infilename, string outfilename)
 		string code = "";
 		createHuffmanCodeTable(HuffmanTree, CodeTable, code);
 
-		cout << "Huffman code successful\n";
 		//Tao chuoi nhi phan ma hoa file
 		string str_code = "";
 
@@ -187,14 +180,13 @@ bool CompressFile(string infilename, string outfilename)
 		}
 
 		int temp = 0;
-		while (temp * 8 < str_code.length())
+		int length = str_code.length();
+		while (temp < length)
 		{
-			string str_temp = "";
-
-			str_temp += str_code.substr(temp * 8, 8);
+			string str_temp = str_code.substr(temp, 8);
 			unsigned char decimal = BinaryToDecimal(str_temp);
 			fwrite(&decimal, sizeof(unsigned char), 1, outfile);
-			temp++;
+			temp += 8;
 		}
 
 		fclose(outfile);
@@ -231,12 +223,23 @@ bool DecompressFile(string infilename, string outfilename)
 	//Doc cac ma nhi phan da ma hoa file
 	unsigned char c;
 	string str_code = "";
+
+	vector<string> hash;
+	hash.resize(256);
+	for (int i = 0; i < 256; i++)
+		hash[i] = "";
 	while (str_code.length() < length_str_code)
 	{
 		//Doc cac ky tu
 		fread(&c, sizeof(unsigned char), 1, infile);
 		//Chuyen thanh ma nhi phan
-		str_code += DecimalToBinary(c);
+		if (hash[int(c)] == "")
+		{
+			hash[int(c)] = DecimalToBinary(c);
+			str_code += hash[int(c)];
+		}
+		else
+			str_code += hash[int(c)];
 	}
 
 	//Xoa cac ky tu 0 thua o cuoi ma nhi phan ma hoa file
