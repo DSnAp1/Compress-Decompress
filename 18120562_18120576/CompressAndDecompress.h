@@ -1,5 +1,6 @@
 #pragma once
 #include "Huffman.h"
+namespace fs = std::experimental::filesystem;
 
 //Tim va tra ve vi tri cua c trong character
 //Neu khong tim thay tra ve -1
@@ -21,21 +22,33 @@ unsigned char BinaryToDecimal(string str);
 //Chuyen doi so thap phan c thanh dang chuoi nhi phan (8 bit)
 string DecimalToBinary(unsigned char c);
 
-//Doc du lieu tu file co ten la filename va tra ve chuoi ghi du lieu vua doc
-string ReadFile(string filename);
+//Doc du lieu tu file co duong dan la path va tra ve chuoi ghi du lieu vua doc
+string ReadFile(string path);
 
-//Nen file co ten infilename vao file co ten outfilename
+//Nen cac file trong filePath vao file co ten compressFile
 //Tra ve: true neu nen thanh cong, false neu nguoc lai
-bool CompressFile(string infilename, string outfilename);
+bool CompressFile(string compressPath, vector<string>filePath, int indexFileName);
 
-//Giai nen file co ten infilename vao file co ten outfilename
+//Giai nen file da ma hoa trong path
 //Tra ve: true neu giai nen thanh cong, false neu nguoc lai
-bool DecompressFile(string infilename, string outfilename);
+bool DecompressFile(string path, string decompressPath, int pos);
 
-//Nen thu muc co duong dan (ten) la path vao file co ten (duong dan) la outfilename
+//Nen thu muc trong folderPath vao file compressPath
 //Tra ve: true neu nen thanh cong, false neu nguoc lai
-bool CompressFolder(string path, string outfilename);
+bool CompressFolder(string compressPath, vector<string>folderPath, int indexFileName);
 
-//Giai nen file (file nay dang nen thu muc) co ten la infilename vao thu muc co duong dan (ten) la path (thu muc nay chua duoc tao)
+//Giai nen cac thu muc trong path
 //Tra ve: true neu giai nen thanh cong, false neu nguoc lai
-bool DecompressFolder(string infilename, string path);
+int DecompressFolder(string path, string decompressPath);
+
+// Lay tat ca cac duong dan bao gom folder va file
+void GetAllPath(string path, vector<string>&filePath, vector<string>&folderPath);
+
+// Lay ten file hoac folder trong duong dan, indexFileName la vi tri bat dau
+string GetFileOrFolderName(string path, int indexFileName);
+
+// Nen
+bool Compress(string path, string compressPath);
+
+// Giai nen
+bool Decompress(string path, string decompressPath);

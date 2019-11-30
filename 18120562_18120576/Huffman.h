@@ -6,7 +6,6 @@
 #include <sstream>
 #include <cmath>
 #include <filesystem>
-#include <direct.h>
 using namespace std;
 
 

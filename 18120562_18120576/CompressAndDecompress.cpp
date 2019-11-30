@@ -2,496 +2,488 @@
 
 int findElementOfVector(vector <char> character, char c)
 {
-	if (character.empty())
+		if (character.empty())
+				return -1;
+		for (int i = 0; i < character.size(); i++)
+				if (character[i] == c)
+						return i;
 		return -1;
-	for (int i = 0; i < character.size(); i++)
-		if (character[i] == c)
-			return i;
-	return -1;
 }
 
 template <typename T>
-
 void mySwap(T& a, T&b)
 {
-	T temp = a;
-	a = b;
-	b = temp;
+		T temp = a;
+		a = b;
+		b = temp;
 }
 
 bool createFrequenceTable(string str, vector <char> &character, vector <int> &frequence)
 {
-	//Neu chuoi rong tra ve false
-	if (str.empty())
-		return false;
+		//Neu chuoi rong tra ve false
+		if (str.empty())
+				return false;
 
-	//Tao bang tan so
-	vector <int> hash;
-	hash.resize(256);
-	for (int i = 0; i < str.length(); i++)
-	{
-		hash[int(str[i]) + 128]++;
-	}
-
-	for (int i = 0; i < hash.size(); i++)
-	{
-		if (hash[i] != 0)
+		//Tao bang tan so
+		vector <int> hash;
+		hash.resize(256);
+		for (int i = 0; i < str.length(); i++)
 		{
-			char c = char(i - 128);
-			character.push_back(c);
-			frequence.push_back(hash[i]);
+				hash[int(str[i]) + 128]++;
 		}
-	}
 
-	//Sap xep lai bang tan so theo thu tu tang dan theo tan so (frequence)
-	for (int i = 0; i < frequence.size() - 1; i++)
-	{
-		int min = i;
-		for (int j = i + 1; j < frequence.size(); j++)
-			if (frequence[j] < frequence[min])
-				min = j;
-		mySwap(frequence[i], frequence[min]);
-		mySwap(character[i], character[min]);
-	}
-	return true;
+		for (int i = 0; i < hash.size(); i++)
+		{
+				if (hash[i] != 0)
+				{
+						char c = char(i - 128);
+						character.push_back(c);
+						frequence.push_back(hash[i]);
+				}
+		}
+
+		//Sap xep lai bang tan so theo thu tu tang dan theo tan so (frequence)
+		for (int i = 0; i < frequence.size() - 1; i++)
+		{
+				int min = i;
+				for (int j = i + 1; j < frequence.size(); j++)
+						if (frequence[j] < frequence[min])
+								min = j;
+				mySwap(frequence[i], frequence[min]);
+				mySwap(character[i], character[min]);
+		}
+		return true;
 }
 
 unsigned char BinaryToDecimal(string str)
 {
 
-	unsigned char S = 0;
-	int temp = 0;
-	for (int i = str.length() - 1; i >= 0; i--)
-	{
-		if (str[i] == '1')
-			S += pow(2, temp);
-		temp++;
-	}
+		unsigned char S = 0;
+		int temp = 0;
+		for (int i = str.length() - 1; i >= 0; i--)
+		{
+				if (str[i] == '1')
+						S += pow(2, temp);
+				temp++;
+		}
 
-	return S;
+		return S;
 }
 
 string DecimalToBinary(unsigned char c)
 {
-	string str = "";
-	while (c != 0)
-	{
-		if (c % 2 == 0)
-			str += "0";
-		else
-			str += "1";
-		c = c / 2;
-	}
-	while (str.length() < 8)
-		str += "0";
-	for (int i = 0; i < str.length() / 2; i++)
-	{
-		mySwap(str[i], str[str.length() - 1 - i]);
-	}
+		string str = "";
+		while (c != 0)
+		{
+				if (c % 2 == 0)
+						str += "0";
+				else
+						str += "1";
+				c = c / 2;
+		}
+		while (str.length() < 8)
+				str += "0";
+		for (int i = 0; i < str.length() / 2; i++)
+		{
+				mySwap(str[i], str[str.length() - 1 - i]);
+		}
 
-	return str;
+		return str;
 }
 
-string ReadFile(string filename)
+string ReadFile(string path)
 {
-	FILE* f = NULL;
-	fopen_s(&f, filename.c_str(), "rb");
+		ifstream inFile(path, ios::in | ios::binary);
 
-	//Neu khong mo duoc file thi tra ve chuoi rong
-	if (f == NULL)
-		return "";
+		if (inFile.fail() || !inFile.good())
+				return "";
 
-	//Doc tung ky tu (tung byte) cua file dua vao chuoi
-	string temp = "";
-	char c;
-	while (!feof(f))
-	{
-		fread(&c, sizeof(char), 1, f);
-		temp += c;
-	}
-	temp.erase(temp.length() - 1);
-	fclose(f);
-	return temp;
+		//Doc tung ky tu (tung byte) cua file dua vao chuoi
+		string temp = "";
+		char c;
+		while (!inFile.eof())
+		{
+				inFile.read((char*)&c, sizeof(char));
+				temp += c;
+		}
+
+		temp.erase(temp.length() - 1);
+
+		inFile.close();
+
+		return temp;
 }
 
-bool CompressFile(string infilename, string outfilename)
+
+bool CompressFile(string compressPath, vector<string>filePath, int indexFileName)
 {
-	//Bang tan so
-	vector <char> character; //Cac ky tu trong bang 
-	vector <int> frequence; //Tan so tuong ung
+		ofstream outFile(compressPath, ios::out | ios::binary | ios::app);
 
-	string str = ReadFile(infilename);
+		if (outFile.fail() || !outFile.good())
+				return false;
 
-	//Tao bang tan so
-	if (!createFrequenceTable(str, character, frequence))
-		return false;
 
-	//Tao cay huffman
-	Node* HuffmanTree = createHuffmanTree(character, frequence);
+		unsigned char count = 1;
 
-	if (HuffmanTree == NULL)
-		return false;
-	else
-	{
-		//Tao bang ma huffman
-		vector <HuffmanCode> CodeTable;
-		string code = "";
-		createHuffmanCodeTable(HuffmanTree, CodeTable, code);
-
-		//Tao chuoi nhi phan ma hoa file
-		string str_code = "";
-
-		vector <string> hash;
-		hash.resize(256);
-
-		for (int i = 0; i < CodeTable.size(); i++)
+		for (auto& filepath : filePath)
 		{
-			hash[int(CodeTable[i].c) + 128] = CodeTable[i].code;
+				// ghi so thu tu
+				outFile.write((char*)&count, sizeof(count));
+
+				string filename = GetFileOrFolderName(filepath, indexFileName);
+
+				// ghi do dai ten file
+				unsigned char len = filename.length();
+				outFile.write((char*)&len, sizeof(len));
+
+				// ghi ten file
+				for (int i = 0; i < int(len); i++)
+				{
+						outFile.write((char*)&filename[i], sizeof(filename[i]));
+				}
+
+				//Bang tan so
+				vector <char> character; //Cac ky tu trong bang 
+				vector <int> frequence; //Tan so tuong ung
+
+				string str = ReadFile(filepath);
+
+				//Tao bang tan so
+				if (!createFrequenceTable(str, character, frequence))
+						return false;
+
+				//Tao cay huffman
+				Node* HuffmanTree = createHuffmanTree(character, frequence);
+
+				if (HuffmanTree == NULL)
+				{
+						return false;
+				}
+				else
+				{
+						//Tao bang ma huffman
+						vector <HuffmanCode> CodeTable;
+						string code = "";
+						createHuffmanCodeTable(HuffmanTree, CodeTable, code);
+
+						//Tao chuoi nhi phan ma hoa file
+						string str_code = "";
+
+						vector <string> hash;
+						hash.resize(256);
+
+						for (int i = 0; i < CodeTable.size(); i++)
+						{
+								hash[int(CodeTable[i].c) + 128] = CodeTable[i].code;
+						}
+
+						for (int i = 0; i < str.length(); i++)
+						{
+								str_code += hash[int(str[i]) + 128];
+						}
+
+
+						//Ghi bang tan so vao file
+						int size_frequence_table = character.size();
+						outFile.write((char*)&size_frequence_table, sizeof(int));
+
+						for (int i = 0; i < size_frequence_table; i++)
+						{
+								outFile.write((char*)&character[i], sizeof(char));
+								outFile.write((char*)&frequence[i], sizeof(int));
+						}
+
+						//Ghi chuoi nhi phan ma hoa vao file
+						int length_str_code = str_code.length();
+
+						outFile.write((char*)&length_str_code, sizeof(int));
+
+						while (str_code.length() % 8 != 0)
+						{
+								str_code += "0";
+						}
+
+						int temp = 0;
+						while (temp * 8 < str_code.length())
+						{
+								string str_temp = "";
+								str_temp += str_code.substr(temp * 8, 8);
+
+								unsigned char decimal = BinaryToDecimal(str_temp);
+
+								outFile.write((char*)&decimal, sizeof(unsigned char));
+								temp++;
+						}
+
+						count++;
+						DeleteTree(HuffmanTree);
+				}
 		}
 
-		for (int i = 0; i < str.length(); i++)
-		{
-			str_code += hash[int(str[i]) + 128];
-		}
+		outFile.close();
 
-
-		FILE* outfile;
-		fopen_s(&outfile, outfilename.c_str(), "wb");
-		if (outfile == NULL)
-			return false;
-
-		//Ghi bang tan so vao file
-		int size_frequence_table = character.size();
-		fwrite(&size_frequence_table, sizeof(int), 1, outfile);
-		for (int i = 0; i < size_frequence_table; i++)
-		{
-			fwrite(&character[i], sizeof(char), 1, outfile);
-			fwrite(&frequence[i], sizeof(int), 1, outfile);
-		}
-
-		//Ghi chuoi nhi phan ma hoa vao file
-		int length_str_code = str_code.length();
-
-		fwrite(&length_str_code, sizeof(int), 1, outfile);
-
-		while (str_code.length() % 8 != 0)
-		{
-			str_code += "0";
-		}
-
-		int temp = 0;
-		int length = str_code.length();
-		while (temp < length)
-		{
-			string str_temp = str_code.substr(temp, 8);
-			unsigned char decimal = BinaryToDecimal(str_temp);
-			fwrite(&decimal, sizeof(unsigned char), 1, outfile);
-			temp += 8;
-		}
-
-		fclose(outfile);
-		DeleteTree(HuffmanTree);
 		return true;
-	}
 }
 
-bool DecompressFile(string infilename, string outfilename)
+bool DecompressFile(string path, string decompressPath, int pos)
 {
-	FILE* infile;
-	fopen_s(&infile, infilename.c_str(), "rb");
-	if (infile == NULL)
-		return false;
+		ifstream inFile(path, ios::in | ios::binary);
 
-	//Doc bang tan so
-	vector <char> character;
-	vector <int> frequence;
-	int size_frequence_table;
+		if (inFile.fail() || !inFile.good())
+				return false;
 
-	fread(&size_frequence_table, sizeof(int), 1, infile);
-	character.resize(size_frequence_table);
-	frequence.resize(size_frequence_table);
-	for (int i = 0; i < size_frequence_table; i++)
-	{
-		fread(&character[i], sizeof(char), 1, infile);
-		fread(&frequence[i], sizeof(int), 1, infile);
-	}
+		inFile.seekg(pos, ios::beg);
 
-	//Doc chieu dai ma nhi phan da ma hoa file
-	int length_str_code;
-	fread(&length_str_code, sizeof(int), 1, infile);
+		unsigned char count; //So thu tu file duoc doc 
+		unsigned char count2 = 1; //So thu tu file tao de so sanh
 
-	//Doc cac ma nhi phan da ma hoa file
-	unsigned char c;
-	string str_code = "";
+		//Doc so thu tu file
+		inFile.read((char*)&count, sizeof(unsigned char));
 
-	vector<string> hash;
-	hash.resize(256);
-	for (int i = 0; i < 256; i++)
-		hash[i] = "";
-	while (str_code.length() < length_str_code)
-	{
-		//Doc cac ky tu
-		fread(&c, sizeof(unsigned char), 1, infile);
-		//Chuyen thanh ma nhi phan
-		if (hash[int(c)] == "")
+		while (!inFile.eof() && count == count2)
 		{
-			hash[int(c)] = DecimalToBinary(c);
-			str_code += hash[int(c)];
+				//Doc do dai ten file
+				unsigned char length_name_file;
+
+				inFile.read((char*)&length_name_file, sizeof(unsigned char));
+
+				//Doc ten file
+				string filename = "";
+				char tmpp;
+				for (int i = 0; i < int(length_name_file); i++)
+				{
+						inFile.read((char*)&tmpp, sizeof(char));
+						filename += tmpp;
+				}
+
+				//Doc bang tan so
+				vector <char> character;
+				vector <int> frequence;
+				int size_frequence_table;
+
+				inFile.read((char*)&size_frequence_table, sizeof(int));
+
+				character.resize(size_frequence_table);
+				frequence.resize(size_frequence_table);
+				for (int i = 0; i < size_frequence_table; i++)
+				{
+						inFile.read((char*)&character[i], sizeof(char));
+						inFile.read((char*)&frequence[i], sizeof(int));
+				}
+
+				//Doc chieu dai ma nhi phan da ma hoa file
+				int length_str_code;
+				inFile.read((char*)&length_str_code, sizeof(int));
+
+				//Doc cac ma nhi phan da ma hoa file
+				unsigned char c;
+				string str_code = "";
+				while (str_code.length() < length_str_code)
+				{
+						//Doc cac ky tu
+						inFile.read((char*)&c, sizeof(unsigned char));
+
+						//Chuyen thanh ma nhi phan
+						str_code += DecimalToBinary(c);
+				}
+
+				//Xoa cac ky tu 0 thua o cuoi ma nhi phan ma hoa file
+				str_code.erase(length_str_code);
+
+				//Xay dung lai cay huffman
+				Node* HuffmanTree = createHuffmanTree(character, frequence);
+				if (HuffmanTree == NULL)
+						return false;
+
+				//Tao file luu trong duong dan thu muc o tren voi ten vua duoc doc tu file ma hoa
+				string path = decompressPath + '\\' + filename;
+				ofstream outFile(path, ios::out | ios::binary);
+
+				//Duyet cac ma nhi phan tren cay de tim ky tu duoc ma hoa va dua vao file giai nen
+				int i = 0;
+				Node *p = HuffmanTree;
+				while (i <= length_str_code)
+				{
+
+						if (p->left == NULL && p->right == NULL)
+						{
+								outFile.write((char*)&p->c, sizeof(char));
+
+								p = HuffmanTree;
+
+								if (i == length_str_code)
+										i++;
+
+								continue;
+						}
+						if (str_code[i] == '0')
+						{
+								p = p->left;
+						}
+						else
+						{
+								if (str_code[i] == '1')
+										p = p->right;
+						}
+
+						i++;
+				}
+
+
+				outFile.close();
+				DeleteTree(HuffmanTree);
+
+				//Doc so thu tu file tiep theo
+				inFile.read((char*)&count, sizeof(unsigned char));
+				count2++;
 		}
-		else
-			str_code += hash[int(c)];
-	}
 
-	//Xoa cac ky tu 0 thua o cuoi ma nhi phan ma hoa file
-	str_code.erase(length_str_code);
+		inFile.close();
 
-	//Xay dung lai cay huffman
-	Node* HuffmanTree = createHuffmanTree(character, frequence);
-	if (HuffmanTree == NULL)
-		return false;
-
-	FILE* outfile;
-	fopen_s(&outfile, outfilename.c_str(), "wb");
-	if (outfile == NULL)
-		return false;
-
-	//Duyet cac ma nhi phan tren cay de tim ky tu duoc ma hoa va dua vao file giai nen
-	int i = 0;
-	Node *p = HuffmanTree;
-	while (i <= length_str_code)
-	{
-
-		if (p->left == NULL && p->right == NULL)
-		{
-			fwrite(&p->c, sizeof(char), 1, outfile);
-			p = HuffmanTree;
-			if (i == length_str_code)
-				i++;
-			continue;
-		}
-		if (str_code[i] == '0')
-			p = p->left;
-		else
-			if (str_code[i] == '1')
-				p = p->right;
-		i++;
-	}
-
-	fclose(infile);
-	fclose(outfile);
-	DeleteTree(HuffmanTree);
-
-	return true;
+		return true;
 }
 
-bool CompressFolder(string path, string outfilename)
+
+
+bool CompressFolder(string compressPath, vector<string>folderPath, int indexFileName)
 {
-	FILE* outfile;
-	fopen_s(&outfile, outfilename.c_str(), "wb");
-	if (outfile == NULL)
-		return false;
-	int count = 1;
+		ofstream outFile(compressPath, ios::out | ios::binary);
 
-	for (auto& entry : experimental::filesystem::directory_iterator(path))
-	{
-		//Ghi so thu tu file
-		fwrite(&count, sizeof(int), 1, outfile);
-		//Ghi do dai ten file
-		string filename = "";
-		for (int i = entry.path().string().length() - 1; i >= 0; i--)
+		if (outFile.fail() || !outFile.good())
+				return false;
+
+		if (folderPath.size() != 0)
 		{
-			if (entry.path().string()[i] != '\\')
-				filename += entry.path().string()[i];
-			else
-				break;
+				string folderCode = "";
+
+				for (auto& item : folderPath)
+				{
+						folderCode += GetFileOrFolderName(item, indexFileName) + '\n';
+				}
+
+				unsigned char lenFolderCode = folderCode.length();
+
+				outFile.write((char*)&lenFolderCode, sizeof(lenFolderCode));
+				for (int i = 0; i < int(lenFolderCode); i++)
+				{
+						outFile.write((char*)&folderCode[i], sizeof(folderCode[i]));
+				}
 		}
-
-		int length_name_file = filename.length();
-		fwrite(&length_name_file, sizeof(int), 1, outfile);
-		//Ghi ten file
-		for (int i = length_name_file - 1; i >= 0; i--)
-			fwrite(&filename[i], sizeof(char), 1, outfile);
-
-
-		//Bang tan so
-		vector <char> character; //Cac ky tu trong bang 
-		vector <int> frequence; //Tan so tuong ung
-
-		string str = ReadFile(entry.path().string());
-		//Tao bang tan so
-		if (!createFrequenceTable(str, character, frequence))
-			return false;
-		//Tao cay huffman
-		Node* HuffmanTree = createHuffmanTree(character, frequence);
-
-		if (HuffmanTree == NULL)
-			return false;
 		else
 		{
-			//Tao bang ma huffman
-			vector <HuffmanCode> CodeTable;
-			string code = "";
-			createHuffmanCodeTable(HuffmanTree, CodeTable, code);
+				unsigned char lenFolderCode = 0;
 
-			//Tao chuoi nhi phan ma hoa file
-			string str_code = "";
-
-			vector <string> hash;
-			hash.resize(256);
-
-			for (int i = 0; i < CodeTable.size(); i++)
-			{
-				hash[int(CodeTable[i].c) + 128] = CodeTable[i].code;
-			}
-
-			for (int i = 0; i < str.length(); i++)
-			{
-				str_code += hash[int(str[i]) + 128];
-			}
-
-
-
-			//Ghi bang tan so vao file
-			int size_frequence_table = character.size();
-			fwrite(&size_frequence_table, sizeof(int), 1, outfile);
-			for (int i = 0; i < size_frequence_table; i++)
-			{
-				fwrite(&character[i], sizeof(char), 1, outfile);
-				fwrite(&frequence[i], sizeof(int), 1, outfile);
-			}
-
-			//Ghi chuoi nhi phan ma hoa vao file
-			int length_str_code = str_code.length();
-
-			fwrite(&length_str_code, sizeof(int), 1, outfile);
-
-			while (str_code.length() % 8 != 0)
-			{
-				str_code += "0";
-			}
-
-			int temp = 0;
-			while (temp * 8 < str_code.length())
-			{
-				string str_temp = "";
-				str_temp += str_code.substr(temp * 8, 8);
-				unsigned char decimal = BinaryToDecimal(str_temp);
-				fwrite(&decimal, sizeof(unsigned char), 1, outfile);
-				temp++;
-			}
-
-			count++;
-			DeleteTree(HuffmanTree);
-
+				outFile.write((char*)&lenFolderCode, sizeof(unsigned char));
 		}
-	}
-	std::fclose(outfile);
-	return true;
+
+		outFile.close();
+
+		return true;
+
 }
 
-bool DecompressFolder(string infilename, string path)
+int DecompressFolder(string path, string decompressPath)
 {
-	//Tao thu muc
-	if (_mkdir(path.c_str()) != 0)
-		return false;
-	FILE* infile;
+		ifstream inFile(path, ios::in | ios::binary);
 
-	fopen_s(&infile, infilename.c_str(), "rb");
-	if (infile == NULL)
-		return false;
-	int count; //So thu tu file duoc doc 
-	int count2 = 1; //So thu tu file tao de so sanh
-	//Doc so thu tu file
-	fread(&count, sizeof(int), 1, infile);
-	while (!feof(infile) && count == count2)
-	{
-		//Doc do dai ten file
-		int length_name_file;
-		fread(&length_name_file, sizeof(int), 1, infile);
+		if (inFile.fail() || !inFile.good())
+				return -1;
 
-		//Doc ten file
-		string filename = "";
-		for (int i = 0; i < length_name_file; i++)
+		unsigned char lenFolderCode;
+		inFile.read((char*)&lenFolderCode, sizeof(lenFolderCode));
+
+		if (int(lenFolderCode) > 0)
 		{
-			char c;
-			fread(&c, sizeof(char), 1, infile);
-			filename += c;
+				string folderCode = "";
+				char tmp;
+
+				for (int i = 0; i < int(lenFolderCode); i++)
+				{
+						inFile.read((char*)&tmp, sizeof(tmp));
+						folderCode += tmp;
+				}
+
+				vector<string> folderPath;
+				string tmpp = "";
+				for (int i = 0; i < lenFolderCode; i++)
+				{
+						if (folderCode[i] == '\n')
+						{
+								folderPath.push_back(tmpp);
+								tmpp = "";
+						}
+						else
+						{
+								tmpp += folderCode[i];
+						}
+				}
+
+				if (fs::exists(folderPath[0]))
+						return -1;
+
+				for (auto& item : folderPath)
+				{		
+						fs::create_directory(decompressPath + '\\' + item);
+				}
 		}
 
-		//Doc bang tan so
-		vector <char> character;
-		vector <int> frequence;
-		int size_frequence_table;
+		return inFile.tellg();
+}
 
-		fread(&size_frequence_table, sizeof(int), 1, infile);
-		character.resize(size_frequence_table);
-		frequence.resize(size_frequence_table);
-		for (int i = 0; i < size_frequence_table; i++)
+
+
+void GetAllPath(string path, vector<string> &filePath, vector<string> &folderPath)
+{
+		if (!fs::is_directory(path))
 		{
-			fread(&character[i], sizeof(char), 1, infile);
-			fread(&frequence[i], sizeof(int), 1, infile);
+				filePath.push_back(path);
+				return;
 		}
-
-		//Doc chieu dai ma nhi phan da ma hoa file
-		int length_str_code;
-		fread(&length_str_code, sizeof(int), 1, infile);
-
-		//Doc cac ma nhi phan da ma hoa file
-		unsigned char c;
-		string str_code = "";
-		while (str_code.length() < length_str_code)
+		else
 		{
-			//Doc cac ky tu
-			fread(&c, sizeof(unsigned char), 1, infile);
-			//Chuyen thanh ma nhi phan
-			str_code += DecimalToBinary(c);
+				folderPath.push_back(path);
+
+				for (auto& entry : fs::directory_iterator(path))
+				{
+						GetAllPath(entry.path().string(), filePath, folderPath);
+				}
 		}
+}
 
-		//Xoa cac ky tu 0 thua o cuoi ma nhi phan ma hoa file
-		str_code.erase(length_str_code);
+string GetFileOrFolderName(string path, int startIndex)
+{
+		return path.substr(startIndex);
+}
 
-		//Xay dung lai cay huffman
-		Node* HuffmanTree = createHuffmanTree(character, frequence);
-		if (HuffmanTree == NULL)
-			return false;
+bool Compress(string path, string compressPath)
+{
+		vector<string> filePath, folderPath;
 
-		//Tao file luu trong duong dan thu muc o tren voi ten vua duoc doc tu file ma hoa
-		FILE* outfile;
-		string s_path = path + '\\' + filename;
-		fopen_s(&outfile, s_path.c_str(), "wb");
-		if (outfile == NULL)
-			return false;
+		GetAllPath(path, filePath, folderPath);
 
-		//Duyet cac ma nhi phan tren cay de tim ky tu duoc ma hoa va dua vao file giai nen
-		int i = 0;
-		Node *p = HuffmanTree;
-		while (i <= length_str_code)
-		{
+		int indexFileName = path.find_last_of('\\') + 1;
 
-			if (p->left == NULL && p->right == NULL)
-			{
-				fwrite(&p->c, sizeof(char), 1, outfile);
-				p = HuffmanTree;
-				if (i == length_str_code)
-					i++;
-				continue;
-			}
-			if (str_code[i] == '0')
-				p = p->left;
-			else
-				if (str_code[i] == '1')
-					p = p->right;
-			i++;
-		}
+		if (!CompressFolder(compressPath, folderPath, indexFileName))
+				return false;
 
+		if (!CompressFile(compressPath, filePath, indexFileName))
+				return false;
 
-		fclose(outfile);
-		DeleteTree(HuffmanTree);
+		return true;
+}
 
-		//Doc so thu tu file tiep theo
-		fread(&count, sizeof(int), 1, infile);
-		count2++;
-	}
-	fclose(infile);
-	return true;
+bool Decompress(string path, string decompressPath)
+{
+		if (path.find(".myzip") == string::npos)
+				return false;
+
+		int pos = DecompressFolder(path, decompressPath);
+
+		if (pos == -1)
+				return false;
+
+		if (!DecompressFile(path, decompressPath, pos))
+				return false;
+
+		return true;
 }
