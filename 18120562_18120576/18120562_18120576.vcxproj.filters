@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Huffman.h">
+    <ClInclude Include="CompressAndDecompress.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CompressAndDecompress.h">
+    <ClInclude Include="Huffman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Program.h">
@@ -26,22 +26,17 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CompressAndDecompress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="Huffman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CompressAndDecompress.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Program.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Input.txt">
-      <Filter>Resource Files</Filter>
-    </Text>
   </ItemGroup>
 </Project>

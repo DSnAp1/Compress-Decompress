@@ -16,7 +16,7 @@ Node* createHuffmanTree(vector <char> character, vector <int> frequence)
 		Tree.push_back(p);
 	}
 
-
+	
 	while (Tree.size() > 1)
 	{
 		//Ket hop 2 node co tan so thap nhat (2 phan tu dau tien cua bang tan so) thanh node moi co 2 con la 2 node cu
@@ -44,7 +44,7 @@ Node* createHuffmanTree(vector <char> character, vector <int> frequence)
 		//Tiep tuc cho den khi chi con 1 node trong Tree
 		//Do la node goc cua cay huffman
 	}
-
+	
 	return Tree[0];
 }
 

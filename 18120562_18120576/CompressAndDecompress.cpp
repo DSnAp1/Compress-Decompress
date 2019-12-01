@@ -184,8 +184,8 @@ bool CompressFile(string compressPath, vector<string>filePath, int indexFileName
 
 
 						//Ghi bang tan so vao file
-						unsigned char size_frequence_table = character.size();
-						outFile.write((char*)&size_frequence_table, sizeof(unsigned char));
+						int size_frequence_table = character.size();
+						outFile.write((char*)&size_frequence_table, sizeof(int));
 
 						for (int i = 0; i < size_frequence_table; i++)
 						{
@@ -259,9 +259,9 @@ bool DecompressFile(string path, string decompressPath, int pos)
 				//Doc bang tan so
 				vector <char> character;
 				vector <int> frequence;
-				unsigned char size_frequence_table;
+				int size_frequence_table;
 				
-				inFile.read((char*)&size_frequence_table, sizeof(unsigned char));
+				inFile.read((char*)&size_frequence_table, sizeof(int));
 
 				character.resize(size_frequence_table);
 				frequence.resize(size_frequence_table);
@@ -300,7 +300,6 @@ bool DecompressFile(string path, string decompressPath, int pos)
 
 				//Xoa cac ky tu 0 thua o cuoi ma nhi phan ma hoa file
 				str_code.erase(length_str_code);
-
 				//Xay dung lai cay huffman
 				Node* HuffmanTree = createHuffmanTree(character, frequence);
 				if (HuffmanTree == NULL)
@@ -489,15 +488,19 @@ bool Decompress(string path, string decompressPath)
 {
 		if (!fs::exists(path) || path.find(".myzip") == string::npos)
 				return false;
-
+	
+		
 		if (fs::exists(decompressPath))
 		{
-				return false;
+				// Kiem tra co phai o dia hay khong
+				if(decompressPath.back() != ':')
+						return false;
 		}
 		else
 		{
 				fs::create_directory(decompressPath);
 		}
+		
 
 		int pos = DecompressFolder(path, decompressPath);
 
