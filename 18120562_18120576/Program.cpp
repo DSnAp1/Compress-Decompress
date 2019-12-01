@@ -49,6 +49,15 @@ void Program::GetCommand()
 		this->_userCmd = tmp;
 }
 
+void Program::StandardizePath(string path)
+{
+		for (int i = 0; i < path.length(); i++)
+		{
+				if (path[i] == '/')
+						path[i] = '\\';
+		}
+}
+
 bool Program::DoCommand()
 {
 		system("cls");
@@ -68,6 +77,10 @@ bool Program::DoCommand()
 				cout << "Input compressed file's path (end with .myzip) : ";
 				rewind(stdin);
 				getline(cin, compressPath);
+
+
+				StandardizePath(path);
+				StandardizePath(compressPath);
 
 				if (Compress(path, compressPath))
 				{
@@ -92,6 +105,10 @@ bool Program::DoCommand()
 				cout << "Input path of decompressed file : ";
 				rewind(stdin);
 				getline(cin, decompressPath);
+
+
+				StandardizePath(path);
+				StandardizePath(decompressPath);
 
 				if (Decompress(path, decompressPath))
 				{
