@@ -7,7 +7,7 @@ class Program
 private:
 		int _userCmd;
 
-		void StandardizePath(string);
+		void StandardizePath(string&);
 public:
 		Program(){}
 		~Program(){}

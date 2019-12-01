@@ -49,11 +49,11 @@ void Program::GetCommand()
 		this->_userCmd = tmp;
 }
 
-void Program::StandardizePath(string path)
+void Program::StandardizePath(string &path)
 {
 		for (int i = 0; i < path.length(); i++)
 		{
-				if (path[i] == '/')
+				if (path[i] == '/' )
 						path[i] = '\\';
 		}
 }

@@ -278,13 +278,24 @@ bool DecompressFile(string path, string decompressPath, int pos)
 				//Doc cac ma nhi phan da ma hoa file
 				unsigned char c;
 				string str_code = "";
+
+				vector<string> hash;
+				hash.resize(256);
+				for (int i = 0; i < 256; i++)
+					hash[i] = "";
 				while (str_code.length() < length_str_code)
 				{
 						//Doc cac ky tu
 						inFile.read((char*)&c, sizeof(unsigned char));
 
 						//Chuyen thanh ma nhi phan
-						str_code += DecimalToBinary(c);
+						if (hash[int(c)] == "")
+						{
+							hash[int(c)] = DecimalToBinary(c);
+							str_code += hash[int(c)];
+						}
+						else
+							str_code += hash[int(c)];
 				}
 
 				//Xoa cac ky tu 0 thua o cuoi ma nhi phan ma hoa file
