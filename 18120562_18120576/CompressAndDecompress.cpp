@@ -490,8 +490,14 @@ bool Decompress(string path, string decompressPath)
 		if (!fs::exists(path) || path.find(".myzip") == string::npos)
 				return false;
 
-		if (!fs::exists(fs::path(decompressPath)))
+		if (fs::exists(decompressPath))
+		{
 				return false;
+		}
+		else
+		{
+				fs::create_directory(decompressPath);
+		}
 
 		int pos = DecompressFolder(path, decompressPath);
 
