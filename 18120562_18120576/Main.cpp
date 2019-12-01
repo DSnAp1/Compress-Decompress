@@ -1,10 +1,11 @@
-#include "CompressAndDecompress.h"
+#include "Program.h"
 
 
 int main()
 {
-		Compress("D:\\a", "D:\\nen.myzip");
-		Decompress("D:\\nen.myzip", "D:\\ak");
+		Program* program = new Program();
+
+		program->Run();
 
 		
 		system("pause");

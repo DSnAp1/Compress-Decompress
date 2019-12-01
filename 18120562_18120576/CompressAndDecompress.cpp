@@ -184,8 +184,8 @@ bool CompressFile(string compressPath, vector<string>filePath, int indexFileName
 
 
 						//Ghi bang tan so vao file
-						int size_frequence_table = character.size();
-						outFile.write((char*)&size_frequence_table, sizeof(int));
+						unsigned char size_frequence_table = character.size();
+						outFile.write((char*)&size_frequence_table, sizeof(unsigned char));
 
 						for (int i = 0; i < size_frequence_table; i++)
 						{
@@ -249,19 +249,19 @@ bool DecompressFile(string path, string decompressPath, int pos)
 
 				//Doc ten file
 				string filename = "";
-				char tmpp;
+				char tmp;
 				for (int i = 0; i < int(length_name_file); i++)
 				{
-						inFile.read((char*)&tmpp, sizeof(char));
-						filename += tmpp;
+						inFile.read((char*)&tmp, sizeof(char));
+						filename += tmp;
 				}
 
 				//Doc bang tan so
 				vector <char> character;
 				vector <int> frequence;
-				int size_frequence_table;
-
-				inFile.read((char*)&size_frequence_table, sizeof(int));
+				unsigned char size_frequence_table;
+				
+				inFile.read((char*)&size_frequence_table, sizeof(unsigned char));
 
 				character.resize(size_frequence_table);
 				frequence.resize(size_frequence_table);
@@ -394,31 +394,26 @@ int DecompressFolder(string path, string decompressPath)
 
 		if (int(lenFolderCode) > 0)
 		{
+				vector<string> folderPath;
 				string folderCode = "";
 				char tmp;
 
 				for (int i = 0; i < int(lenFolderCode); i++)
 				{
 						inFile.read((char*)&tmp, sizeof(tmp));
-						folderCode += tmp;
-				}
 
-				vector<string> folderPath;
-				string tmpp = "";
-				for (int i = 0; i < lenFolderCode; i++)
-				{
-						if (folderCode[i] == '\n')
+						if (tmp == '\n')
 						{
-								folderPath.push_back(tmpp);
-								tmpp = "";
+								folderPath.push_back(folderCode);
+								folderCode = "";
 						}
 						else
 						{
-								tmpp += folderCode[i];
+								folderCode += tmp;
 						}
 				}
 
-				if (fs::exists(folderPath[0]))
+				if (fs::exists(decompressPath + '\\' + folderPath[0]))
 						return -1;
 
 				for (auto& item : folderPath)
@@ -457,24 +452,34 @@ string GetFileOrFolderName(string path, int startIndex)
 
 bool Compress(string path, string compressPath)
 {
+		if (!fs::exists(path))
+				return false;
+
+		if (compressPath.find(".myzip") == string::npos)
+				return false;
+
 		vector<string> filePath, folderPath;
 
 		GetAllPath(path, filePath, folderPath);
 
 		int indexFileName = path.find_last_of('\\') + 1;
 
-		if (!CompressFolder(compressPath, folderPath, indexFileName))
+		if (!CompressFolder(compressPath, folderPath, indexFileName) ||
+				!CompressFile(compressPath, filePath, indexFileName))
+		{
+				fs::remove(compressPath);
 				return false;
-
-		if (!CompressFile(compressPath, filePath, indexFileName))
-				return false;
+		}
 
 		return true;
 }
 
 bool Decompress(string path, string decompressPath)
 {
-		if (path.find(".myzip") == string::npos)
+		if (!fs::exists(path) || path.find(".myzip") == string::npos)
+				return false;
+
+		if (!fs::exists(fs::path(decompressPath)))
 				return false;
 
 		int pos = DecompressFolder(path, decompressPath);

@@ -1,12 +1,6 @@
-﻿  CompressAndDecompress.cpp
+﻿  Program.cpp
 c:\users\asus\desktop\compress-decompress\18120562_18120576\huffman.h(19): warning C4091: 'typedef ': ignored on left of 'Node' when no variable is declared
 c:\users\asus\desktop\compress-decompress\18120562_18120576\huffman.h(26): warning C4091: 'typedef ': ignored on left of 'HuffmanCode' when no variable is declared
-c:\users\asus\desktop\compress-decompress\18120562_18120576\compressanddecompress.cpp(63): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-c:\users\asus\desktop\compress-decompress\18120562_18120576\compressanddecompress.cpp(66): warning C4244: '+=': conversion from 'double' to 'unsigned char', possible loss of data
-c:\users\asus\desktop\compress-decompress\18120562_18120576\compressanddecompress.cpp(106): error C2059: syntax error: 'sizeof'
-c:\users\asus\desktop\compress-decompress\18120562_18120576\compressanddecompress.cpp(144): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned char', possible loss of data
-c:\users\asus\desktop\compress-decompress\18120562_18120576\compressanddecompress.cpp(195): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-c:\users\asus\desktop\compress-decompress\18120562_18120576\compressanddecompress.cpp(205): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-c:\users\asus\desktop\compress-decompress\18120562_18120576\compressanddecompress.cpp(372): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned char', possible loss of data
-c:\users\asus\desktop\compress-decompress\18120562_18120576\compressanddecompress.cpp(439): warning C4244: 'return': conversion from 'std::streamoff' to 'int', possible loss of data
-c:\users\asus\desktop\compress-decompress\18120562_18120576\compressanddecompress.cpp(472): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\asus\desktop\compress-decompress\18120562_18120576\program.cpp(43): warning C4101: 's': unreferenced local variable
+c:\users\asus\desktop\compress-decompress\18120562_18120576\program.cpp(108): warning C4715: 'Program::DoCommand': not all control paths return a value
+  18120562_18120576.vcxproj -> C:\Users\ASUS\Desktop\Compress-Decompress\x64\Debug\18120562_18120576.exe

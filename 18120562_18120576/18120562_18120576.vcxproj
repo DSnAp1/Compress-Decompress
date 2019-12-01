@@ -117,11 +117,13 @@
   <ItemGroup>
     <ClInclude Include="CompressAndDecompress.h" />
     <ClInclude Include="Huffman.h" />
+    <ClInclude Include="Program.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CompressAndDecompress.cpp" />
     <ClCompile Include="Huffman.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Program.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Input.txt" />
