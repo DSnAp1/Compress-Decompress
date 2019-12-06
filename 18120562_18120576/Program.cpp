@@ -56,6 +56,9 @@ void Program::StandardizePath(string &path)
 				if (path[i] == '/' )
 						path[i] = '\\';
 		}
+
+		while (path.back() == '/' || path.back() == '\\')
+				path.pop_back();
 }
 
 bool Program::DoCommand()

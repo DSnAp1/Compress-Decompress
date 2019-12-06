@@ -14,7 +14,7 @@ void mySwap(T& a, T&b);
 //character: cac ky tu trong bang tan so
 //frequence: tan so tuong ung
 //Bang tan so duoc sap xep tang dan theo tan so
-bool createFrequenceTable(string str, vector <char> &character, vector <int> &frequence);
+void CreateFrequenceTable(string str, vector <char> &character, vector <int> &frequence);
 
 //Chuyen doi chuoi nhi phan string (8 bit tuong ung 8 ky tu) thanh dang thap phan
 unsigned char BinaryToDecimal(string str);

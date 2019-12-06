@@ -18,20 +18,19 @@ void mySwap(T& a, T&b)
 		b = temp;
 }
 
-bool createFrequenceTable(string str, vector <char> &character, vector <int> &frequence)
+void CreateFrequenceTable(string str, vector <char> &character, vector <int> &frequence)
 {
-		//Neu chuoi rong tra ve false
-		if (str.empty())
-				return false;
+		if (str == "")
+				return;
 
-		//Tao bang tan so
-		vector <int> hash;
-		hash.resize(256);
+		vector<int>hash(256, 0);
+
 		for (int i = 0; i < str.length(); i++)
 		{
 				hash[int(str[i]) + 128]++;
 		}
 
+		//Tao bang tan so
 		for (int i = 0; i < hash.size(); i++)
 		{
 				if (hash[i] != 0)
@@ -49,21 +48,22 @@ bool createFrequenceTable(string str, vector <char> &character, vector <int> &fr
 				for (int j = i + 1; j < frequence.size(); j++)
 						if (frequence[j] < frequence[min])
 								min = j;
+
 				mySwap(frequence[i], frequence[min]);
 				mySwap(character[i], character[min]);
 		}
-		return true;
 }
 
 unsigned char BinaryToDecimal(string str)
 {
-
 		unsigned char S = 0;
 		int temp = 0;
+
 		for (int i = str.length() - 1; i >= 0; i--)
 		{
 				if (str[i] == '1')
 						S += pow(2, temp);
+				
 				temp++;
 		}
 
@@ -73,16 +73,20 @@ unsigned char BinaryToDecimal(string str)
 string DecimalToBinary(unsigned char c)
 {
 		string str = "";
+
 		while (c != 0)
 		{
 				if (c % 2 == 0)
-						str += "0";
+						str += '0';
 				else
-						str += "1";
-				c = c / 2;
+						str += '1';
+
+				c /= 2;
 		}
+
 		while (str.length() < 8)
-				str += "0";
+				str += '0';
+
 		for (int i = 0; i < str.length() / 2; i++)
 		{
 				mySwap(str[i], str[str.length() - 1 - i]);
@@ -98,20 +102,22 @@ string ReadFile(string path)
 		if (inFile.fail() || !inFile.good())
 				return "";
 
-		//Doc tung ky tu (tung byte) cua file dua vao chuoi
-		string temp = "";
-		char c;
-		while (!inFile.eof())
-		{
-				inFile.read((char*)&c, sizeof(char));
-				temp += c;
-		}
-
-		temp.erase(temp.length() - 1);
+		inFile.seekg(0, inFile.end);
+		int size = inFile.tellg();
+		inFile.seekg(0, inFile.beg);
+		
+		char *temp = new char[size + 1];
+		inFile.read(temp, size);
+		temp[size] = '\0';
 
 		inFile.close();
 
-		return temp;
+		string str;
+		str.assign(temp);
+
+		delete[] temp;
+
+		return str;
 }
 
 
@@ -121,7 +127,6 @@ bool CompressFile(string compressPath, vector<string>filePath, int indexFileName
 
 		if (outFile.fail() || !outFile.good())
 				return false;
-
 
 		unsigned char count = 1;
 
@@ -137,87 +142,91 @@ bool CompressFile(string compressPath, vector<string>filePath, int indexFileName
 				outFile.write((char*)&len, sizeof(len));
 
 				// ghi ten file
-				for (int i = 0; i < int(len); i++)
+				for (int i = 0; i < len; i++)
 				{
-						outFile.write((char*)&filename[i], sizeof(filename[i]));
+						outFile.write((char*)&filename[i],sizeof(filename[i]));
 				}
 
 				//Bang tan so
 				vector <char> character; //Cac ky tu trong bang 
 				vector <int> frequence; //Tan so tuong ung
-
 				string str = ReadFile(filepath);
 
+
 				//Tao bang tan so
-				if (!createFrequenceTable(str, character, frequence))
-						return false;
+				CreateFrequenceTable(str, character, frequence);
+
 
 				//Tao cay huffman
 				Node* HuffmanTree = createHuffmanTree(character, frequence);
 
-				if (HuffmanTree == NULL)
+				//Tao bang ma huffman
+				vector <HuffmanCode> CodeTable;
+				string code = "";
+				createHuffmanCodeTable(HuffmanTree, CodeTable, code);
+
+
+				//Ghi bang tan so vao file
+				unsigned char size_frequence_table = character.size();
+				outFile.write((char*)&size_frequence_table, sizeof(unsigned char));
+
+				if (size_frequence_table != 0)
 				{
-						return false;
+						outFile.write((char*)&character[0], sizeof(char) * character.size());
+						outFile.write((char*)&frequence[0], sizeof(int) * frequence.size());
 				}
-				else
+
+				//Tao chuoi nhi phan ma hoa file
+				string str_code = "";
+
+				vector <string> hash;
+				hash.resize(256);
+
+				unsigned int lengthStrCode = 0;
+
+				for (int i = 0; i < CodeTable.size(); i++)
 				{
-						//Tao bang ma huffman
-						vector <HuffmanCode> CodeTable;
-						string code = "";
-						createHuffmanCodeTable(HuffmanTree, CodeTable, code);
+						hash[int(CodeTable[i].c) + 128] = CodeTable[i].code;
 
-						//Tao chuoi nhi phan ma hoa file
-						string str_code = "";
+						lengthStrCode += CodeTable[i].code.length() * CodeTable[i].frequence;
+				}
 
-						vector <string> hash;
-						hash.resize(256);
+				outFile.write((char*)&lengthStrCode, sizeof(unsigned int));
 
-						for (int i = 0; i < CodeTable.size(); i++)
+				vector<unsigned char>decimalCode;
+
+				for (int i = 0; i < str.length(); i++)
+				{
+						str_code += hash[int(str[i]) + 128];
+
+						while (str_code.length() >= 8)
 						{
-								hash[int(CodeTable[i].c) + 128] = CodeTable[i].code;
+								decimalCode.push_back(BinaryToDecimal(str_code.substr(0, 8)));
+								str_code = str_code.substr(8);
 						}
+				}
 
-						for (int i = 0; i < str.length(); i++)
-						{
-								str_code += hash[int(str[i]) + 128];
-						}
+				if (str_code.length() > 0)
+				{
+						while (str_code.length() < 8)
+								str_code += '0';
 
+						decimalCode.push_back(BinaryToDecimal(str_code));
 
-						//Ghi bang tan so vao file
-						int size_frequence_table = character.size();
-						outFile.write((char*)&size_frequence_table, sizeof(int));
+				}
 
-						for (int i = 0; i < size_frequence_table; i++)
-						{
-								outFile.write((char*)&character[i], sizeof(char));
-								outFile.write((char*)&frequence[i], sizeof(int));
-						}
+				unsigned int decimalCodeLen = decimalCode.size();
+				outFile.write((char*)&decimalCodeLen, sizeof(unsigned int));
 
-						//Ghi chuoi nhi phan ma hoa vao file
-						int length_str_code = str_code.length();
+				if (decimalCodeLen != 0)
+				{
+						outFile.write((char*)&decimalCode[0], decimalCodeLen);
+				}
 
-						outFile.write((char*)&length_str_code, sizeof(int));
-
-						while (str_code.length() % 8 != 0)
-						{
-								str_code += "0";
-						}
-
-						int temp = 0;
-						while (temp * 8 < str_code.length())
-						{
-								string str_temp = "";
-								str_temp += str_code.substr(temp * 8, 8);
-
-								unsigned char decimal = BinaryToDecimal(str_temp);
-
-								outFile.write((char*)&decimal, sizeof(unsigned char));
-								temp++;
-						}
-
-						count++;
+				if(HuffmanTree != NULL)
 						DeleteTree(HuffmanTree);
-				}
+
+				count++;
 		}
 
 		outFile.close();
@@ -237,115 +246,131 @@ bool DecompressFile(string path, string decompressPath, int pos)
 		unsigned char count; //So thu tu file duoc doc 
 		unsigned char count2 = 1; //So thu tu file tao de so sanh
 
-		//Doc so thu tu file
-		inFile.read((char*)&count, sizeof(unsigned char));
-
-		while (!inFile.eof() && count == count2)
+		while (!inFile.eof())
 		{
-				//Doc do dai ten file
-				unsigned char length_name_file;
-
-				inFile.read((char*)&length_name_file, sizeof(unsigned char));
-
-				//Doc ten file
-				string filename = "";
-				char tmp;
-				for (int i = 0; i < int(length_name_file); i++)
-				{
-						inFile.read((char*)&tmp, sizeof(char));
-						filename += tmp;
-				}
-
-				//Doc bang tan so
-				vector <char> character;
-				vector <int> frequence;
-				int size_frequence_table;
-				
-				inFile.read((char*)&size_frequence_table, sizeof(int));
-
-				character.resize(size_frequence_table);
-				frequence.resize(size_frequence_table);
-				for (int i = 0; i < size_frequence_table; i++)
-				{
-						inFile.read((char*)&character[i], sizeof(char));
-						inFile.read((char*)&frequence[i], sizeof(int));
-				}
-
-				//Doc chieu dai ma nhi phan da ma hoa file
-				int length_str_code;
-				inFile.read((char*)&length_str_code, sizeof(int));
-
-				//Doc cac ma nhi phan da ma hoa file
-				unsigned char c;
-				string str_code = "";
-
-				vector<string> hash;
-				hash.resize(256);
-				for (int i = 0; i < 256; i++)
-					hash[i] = "";
-				while (str_code.length() < length_str_code)
-				{
-						//Doc cac ky tu
-						inFile.read((char*)&c, sizeof(unsigned char));
-
-						//Chuyen thanh ma nhi phan
-						if (hash[int(c)] == "")
-						{
-							hash[int(c)] = DecimalToBinary(c);
-							str_code += hash[int(c)];
-						}
-						else
-							str_code += hash[int(c)];
-				}
-
-				//Xoa cac ky tu 0 thua o cuoi ma nhi phan ma hoa file
-				str_code.erase(length_str_code);
-				//Xay dung lai cay huffman
-				Node* HuffmanTree = createHuffmanTree(character, frequence);
-				if (HuffmanTree == NULL)
-						return false;
-
-				//Tao file luu trong duong dan thu muc o tren voi ten vua duoc doc tu file ma hoa
-				string path = decompressPath + '\\' + filename;
-				ofstream outFile(path, ios::out | ios::binary);
-
-				//Duyet cac ma nhi phan tren cay de tim ky tu duoc ma hoa va dua vao file giai nen
-				int i = 0;
-				Node *p = HuffmanTree;
-				while (i <= length_str_code)
-				{
-
-						if (p->left == NULL && p->right == NULL)
-						{
-								outFile.write((char*)&p->c, sizeof(char));
-
-								p = HuffmanTree;
-
-								if (i == length_str_code)
-										i++;
-
-								continue;
-						}
-						if (str_code[i] == '0')
-						{
-								p = p->left;
-						}
-						else
-						{
-								if (str_code[i] == '1')
-										p = p->right;
-						}
-
-						i++;
-				}
-
-
-				outFile.close();
-				DeleteTree(HuffmanTree);
-
-				//Doc so thu tu file tiep theo
+				//Doc so thu tu file
 				inFile.read((char*)&count, sizeof(unsigned char));
-				count2++;
+
+				if (count == count2)
+				{
+						//Doc do dai ten file
+						unsigned char length_name_file;
+						inFile.read((char*)&length_name_file, sizeof(unsigned char));
+
+						//Doc ten file
+						string filename = "";
+						char tmp;
+						for (int i = 0; i < int(length_name_file); i++)
+						{
+								inFile.read((char*)&tmp, sizeof(char));
+								filename += tmp;
+						}
+
+						//Tao file luu trong duong dan thu muc o tren voi ten vua duoc doc tu file ma hoa
+						string path = decompressPath + '\\' + filename;
+						ofstream outFile(path, ios::out | ios::binary);
+
+						//Doc bang tan so
+						unsigned char size_frequence_table;
+						inFile.read((char*)&size_frequence_table, sizeof(unsigned char));
+
+						vector <char> character(size_frequence_table);
+						vector <int> frequence(size_frequence_table);
+
+						if (size_frequence_table != 0)
+						{
+								inFile.read((char*)&character[0], sizeof(char) * size_frequence_table);
+								inFile.read((char*)&frequence[0], sizeof(int) * size_frequence_table);
+						}
+
+						//Doc chieu dai ma nhi phan da ma hoa file
+						unsigned int lengthStrCode;
+						inFile.read((char*)&lengthStrCode, sizeof(unsigned int));
+
+						//Doc cac ma nhi phan da ma hoa file
+						string str_code = "";
+						vector<string> hash(256, "");
+
+						// Doc chieu dai cua decimal code
+						unsigned int decimalCodeLen;
+						inFile.read((char*)&decimalCodeLen, sizeof(unsigned int));
+						cout << "decima L : " << decimalCodeLen << endl;
+						system("pause");
+						// Doc cac decimal code
+						vector<unsigned char>decimalCode(decimalCodeLen);
+
+						if (decimalCodeLen != 0)
+						{
+								inFile.read((char*)&decimalCode[0], decimalCodeLen);
+
+								for (auto& code : decimalCode)
+								{
+										if (hash[int(code)] == "")
+										{
+												hash[int(code)] = DecimalToBinary(code);
+												str_code += hash[int(code)];
+										}
+										else
+										{
+												str_code += hash[int(code)];
+										}
+								}
+						}
+
+						//Xoa cac ky tu 0 thua o cuoi ma nhi phan ma hoa file
+						if (str_code != "")
+								str_code.erase(lengthStrCode);
+
+
+						//Xay dung lai cay huffman
+						Node* HuffmanTree = createHuffmanTree(character, frequence);
+
+		
+						//Duyet cac ma nhi phan tren cay de tim ky tu duoc ma hoa va dua vao file giai nen
+						if (HuffmanTree != NULL)
+						{
+								unsigned int i = 0;
+								Node *p = HuffmanTree;
+								string str = "";
+
+								while (i <= lengthStrCode)
+								{
+
+										if (p->left == NULL && p->right == NULL)
+										{
+												str += p->c;
+
+												p = HuffmanTree;
+
+												if (i == lengthStrCode)
+														i++;
+
+												continue;
+										}
+										if (str_code[i] == '0')
+										{
+												p = p->left;
+										}
+										else
+										{
+												if (str_code[i] == '1')
+														p = p->right;
+										}
+
+										i++;
+								}
+
+								// export data
+								outFile.write(str.c_str(), str.size());
+						}
+
+						outFile.close();
+
+						if (HuffmanTree != NULL)
+								DeleteTree(HuffmanTree);
+
+						count2++;
+				}
 		}
 
 		inFile.close();
@@ -504,11 +529,13 @@ bool Decompress(string path, string decompressPath)
 
 		int pos = DecompressFolder(path, decompressPath);
 
-		if (pos == -1)
-				return false;
+		if (pos == -1 || !DecompressFile(path, decompressPath, pos))
+		{
+				if (decompressPath.back() != ':')
+						fs::remove(decompressPath);
 
-		if (!DecompressFile(path, decompressPath, pos))
 				return false;
+		}
 
 		return true;
 }

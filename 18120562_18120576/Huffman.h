@@ -1,11 +1,11 @@
 #pragma once
 #include <iostream>
 #include <vector>
-#include <string>
 #include <fstream>
 #include <sstream>
 #include <cmath>
 #include <filesystem>
+#include <string>
 using namespace std;
 
 
@@ -23,6 +23,7 @@ typedef struct HuffmanCode
 {
 	char c;
 	string code;
+	int frequence;
 };
 
 

@@ -4,6 +4,9 @@
 Node* createHuffmanTree(vector <char> character, vector <int> frequence)
 {
 	vector <Node*> Tree; //Danh sach cac node la trong cay
+		
+	if (character.size() == 0)
+			return NULL;
 
 	//Tao cac node tuong ung cac ky tu 
 	for (int i = 0; i < character.size(); i++)
@@ -50,6 +53,9 @@ Node* createHuffmanTree(vector <char> character, vector <int> frequence)
 
 void createHuffmanCodeTable(Node* Tree, vector <HuffmanCode> &Table, string code)
 {
+		if (Tree == NULL)
+				return;
+
 	if (Tree->left != NULL || Tree->right != NULL)
 	{
 		//Neu qua trai thi them 0 vao ma
@@ -63,6 +69,7 @@ void createHuffmanCodeTable(Node* Tree, vector <HuffmanCode> &Table, string code
 		HuffmanCode temp;
 		temp.c = Tree->c;
 		temp.code = code;
+		temp.frequence = Tree->frequence;
 		Table.push_back(temp);
 	}
 }
