@@ -1,4 +1,7 @@
 #include "Program.h"
+#include <thread>
+
+
 
 
 int main()
@@ -8,7 +11,8 @@ int main()
 		program->Run();
 
 
-		
+
+
 		system("pause");
 		return 0;
 }

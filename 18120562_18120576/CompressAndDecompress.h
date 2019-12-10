@@ -1,5 +1,6 @@
 #pragma once
 #include "Huffman.h"
+#include <thread>
 namespace fs = std::experimental::filesystem;
 
 //Tim va tra ve vi tri cua c trong character
@@ -52,3 +53,9 @@ bool Compress(string path, string compressPath);
 
 // Giai nen
 bool Decompress(string path, string decompressPath);
+
+void FindFrequence(string str, vector<int> &hash);
+
+void Serialize(string binaryCode, vector<unsigned char>&decimalCode);
+
+void GetBinaryCode(string str, vector<string> hash, string& strCode);

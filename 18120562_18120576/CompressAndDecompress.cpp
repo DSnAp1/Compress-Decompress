@@ -18,6 +18,14 @@ void mySwap(T& a, T&b)
 		b = temp;
 }
 
+void FindFrequence(string str, vector<int> &hash)
+{
+		for (int i = 0; i < str.length(); i++)
+		{
+				hash[int(str[i]) + 128]++;
+		}
+}
+
 void CreateFrequenceTable(string str, vector <char> &character, vector <int> &frequence)
 {
 		if (str == "")
@@ -25,10 +33,15 @@ void CreateFrequenceTable(string str, vector <char> &character, vector <int> &fr
 
 		vector<int>hash(256, 0);
 
-		for (int i = 0; i < str.length(); i++)
-		{
-				hash[int(str[i]) + 128]++;
-		}
+		int n = str.length() / 3;
+
+		thread task1(FindFrequence, str.substr(0, n), ref(hash));
+		thread task2(FindFrequence, str.substr(n, n), ref(hash));
+		thread task3(FindFrequence, str.substr(2 * n), ref(hash));
+
+		task1.join();
+		task2.join();
+		task3.join();
 
 		//Tao bang tan so
 		for (int i = 0; i < hash.size(); i++)
@@ -121,6 +134,23 @@ string ReadFile(string path)
 }
 
 
+void GetBinaryCode(string str, vector<string> hash, string& strCode)
+{
+		for (int i = 0; i < str.length(); i++)
+		{
+				strCode += hash[int(str[i]) + 128];
+		}
+}
+
+void Serialize(string binaryCode, vector<unsigned char>&decimalCode)
+{
+		while (binaryCode.length() >= 8)
+		{
+				decimalCode.push_back(BinaryToDecimal(binaryCode.substr(0, 8)));
+				binaryCode = binaryCode.substr(8);
+		}
+}
+
 bool CompressFile(string compressPath, vector<string>filePath, int indexFileName)
 {
 		ofstream outFile(compressPath, ios::out | ios::binary | ios::app);
@@ -151,7 +181,6 @@ bool CompressFile(string compressPath, vector<string>filePath, int indexFileName
 				vector <char> character; //Cac ky tu trong bang 
 				vector <int> frequence; //Tan so tuong ung
 				string str = ReadFile(filepath);
-
 
 				//Tao bang tan so
 				CreateFrequenceTable(str, character, frequence);
@@ -192,7 +221,7 @@ bool CompressFile(string compressPath, vector<string>filePath, int indexFileName
 				}
 
 				outFile.write((char*)&lengthStrCode, sizeof(unsigned int));
-
+				
 				vector<unsigned char>decimalCode;
 
 				for (int i = 0; i < str.length(); i++)
@@ -212,8 +241,8 @@ bool CompressFile(string compressPath, vector<string>filePath, int indexFileName
 								str_code += '0';
 
 						decimalCode.push_back(BinaryToDecimal(str_code));
-
 				}
+				
 
 				unsigned int decimalCodeLen = decimalCode.size();
 				outFile.write((char*)&decimalCodeLen, sizeof(unsigned int));
@@ -294,8 +323,7 @@ bool DecompressFile(string path, string decompressPath, int pos)
 						// Doc chieu dai cua decimal code
 						unsigned int decimalCodeLen;
 						inFile.read((char*)&decimalCodeLen, sizeof(unsigned int));
-						cout << "decima L : " << decimalCodeLen << endl;
-						system("pause");
+
 						// Doc cac decimal code
 						vector<unsigned char>decimalCode(decimalCodeLen);
 
