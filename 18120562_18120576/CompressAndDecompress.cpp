@@ -32,16 +32,24 @@ void CreateFrequenceTable(string str, vector <char> &character, vector <int> &fr
 				return;
 
 		vector<int>hash(256, 0);
+		vector<int>temp1(256,0);
+		vector<int>temp2(256,0);
+		vector<int>temp3(256,0);
 
 		int n = str.length() / 3;
 
-		thread task1(FindFrequence, str.substr(0, n), ref(hash));
-		thread task2(FindFrequence, str.substr(n, n), ref(hash));
-		thread task3(FindFrequence, str.substr(2 * n), ref(hash));
+		thread task1(FindFrequence, str.substr(0, n), ref(temp1));
+		thread task2(FindFrequence, str.substr(n, n), ref(temp2));
+		thread task3(FindFrequence, str.substr(2 * n), ref(temp3));
 
 		task1.join();
 		task2.join();
 		task3.join();
+
+		for (int i = 0; i < 256; i++)
+		{
+				hash[i] = temp1[i] + temp2[i] + temp3[i];
+		}
 
 		//Tao bang tan so
 		for (int i = 0; i < hash.size(); i++)
@@ -115,41 +123,40 @@ string ReadFile(string path)
 		if (inFile.fail() || !inFile.good())
 				return "";
 
-		inFile.seekg(0, inFile.end);
-		int size = inFile.tellg();
-		inFile.seekg(0, inFile.beg);
-		
-		char *temp = new char[size + 1];
-		inFile.read(temp, size);
-		temp[size] = '\0';
+		string str = "";
 
-		inFile.close();
+		if (path.find(".txt") != string::npos)
+		{
+				inFile.seekg(0, inFile.end);
+				int size = inFile.tellg();
+				inFile.seekg(0, inFile.beg);
+	
+				char *temp = new char[size + 1];
+				inFile.read(temp, size);
+				temp[size] = '\0';
 
-		string str;
-		str.assign(temp);
+				str.assign(temp);
 
-		delete[] temp;
+				delete[] temp;
+		}
+		else
+		{
+				char temp;
+
+				while (!inFile.eof())
+				{
+						inFile.read((char*)&temp, sizeof(temp));
+						str += temp;
+				}
+		}
 
 		return str;
+
+		inFile.close();
 }
 
 
-void GetBinaryCode(string str, vector<string> hash, string& strCode)
-{
-		for (int i = 0; i < str.length(); i++)
-		{
-				strCode += hash[int(str[i]) + 128];
-		}
-}
 
-void Serialize(string binaryCode, vector<unsigned char>&decimalCode)
-{
-		while (binaryCode.length() >= 8)
-		{
-				decimalCode.push_back(BinaryToDecimal(binaryCode.substr(0, 8)));
-				binaryCode = binaryCode.substr(8);
-		}
-}
 
 bool CompressFile(string compressPath, vector<string>filePath, int indexFileName)
 {
@@ -359,14 +366,13 @@ bool DecompressFile(string path, string decompressPath, int pos)
 						{
 								unsigned int i = 0;
 								Node *p = HuffmanTree;
-								string str = "";
 
 								while (i <= lengthStrCode)
 								{
 
 										if (p->left == NULL && p->right == NULL)
 										{
-												str += p->c;
+												outFile.write((char*)&p->c, sizeof(p->c));
 
 												p = HuffmanTree;
 
@@ -387,9 +393,6 @@ bool DecompressFile(string path, string decompressPath, int pos)
 
 										i++;
 								}
-
-								// export data
-								outFile.write(str.c_str(), str.size());
 						}
 
 						outFile.close();

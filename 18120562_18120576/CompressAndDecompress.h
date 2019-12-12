@@ -55,7 +55,3 @@ bool Compress(string path, string compressPath);
 bool Decompress(string path, string decompressPath);
 
 void FindFrequence(string str, vector<int> &hash);
-
-void Serialize(string binaryCode, vector<unsigned char>&decimalCode);
-
-void GetBinaryCode(string str, vector<string> hash, string& strCode);
