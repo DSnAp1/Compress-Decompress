@@ -3,10 +3,6 @@
 #include <thread>
 namespace fs = std::experimental::filesystem;
 
-//Tim va tra ve vi tri cua c trong character
-//Neu khong tim thay tra ve -1
-int findElementOfVector(vector <char> character, char c);
-
 template <typename T>
 //Hoan vi a va b
 void mySwap(T& a, T&b);
@@ -34,7 +30,7 @@ bool CompressFile(string compressPath, vector<string>filePath, int indexFileName
 //Tra ve: true neu giai nen thanh cong, false neu nguoc lai
 bool DecompressFile(string path, string decompressPath, int pos);
 
-//Nen thu muc trong folderPath vao file compressPath
+//Nen cac thu muc trong folderPath vao file compressPath
 //Tra ve: true neu nen thanh cong, false neu nguoc lai
 bool CompressFolder(string compressPath, vector<string>folderPath, int indexFileName);
 
@@ -48,14 +44,11 @@ void GetAllPath(string path, vector<string>&filePath, vector<string>&folderPath)
 // Lay ten file hoac folder trong duong dan, indexFileName la vi tri bat dau
 string GetFileOrFolderName(string path, int indexFileName);
 
-// Nen
+// Nen (chung cho thu muc va file)
 bool Compress(string path, string compressPath);
 
-// Giai nen
+// Giai nen (chung cho thu muc va file)
 bool Decompress(string path, string decompressPath);
 
+//Tim va ghi tan so xuat hien cua cac ky tu trong str vao hash (tuong tu bang bam)
 void FindFrequence(string str, vector<int> &hash);
-
-void Serialize(string binaryCode, vector<unsigned char>&decimalCode);
-
-void GetBinaryCode(string str, vector<string> hash, string& strCode);
