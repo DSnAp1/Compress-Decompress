@@ -1,15 +1,5 @@
 #include "CompressAndDecompress.h"
 
-int findElementOfVector(vector <char> character, char c)
-{
-		if (character.empty())
-				return -1;
-		for (int i = 0; i < character.size(); i++)
-				if (character[i] == c)
-						return i;
-		return -1;
-}
-
 template <typename T>
 void mySwap(T& a, T&b)
 {
@@ -156,8 +146,11 @@ string ReadFile(string path)
 }
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 8c1666c964f0d0549aa914333003105bed268137
 bool CompressFile(string compressPath, vector<string>filePath, int indexFileName)
 {
 		ofstream outFile(compressPath, ios::out | ios::binary | ios::app);
