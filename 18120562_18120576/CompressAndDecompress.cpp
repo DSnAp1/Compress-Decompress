@@ -138,19 +138,16 @@ string ReadFile(string path)
 						inFile.read((char*)&temp, sizeof(temp));
 						str += temp;
 				}
+
+				str.pop_back();
 		}
 
-		return str;
-
 		inFile.close();
+
+		return str;
 }
 
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 8c1666c964f0d0549aa914333003105bed268137
 bool CompressFile(string compressPath, vector<string>filePath, int indexFileName)
 {
 		ofstream outFile(compressPath, ios::out | ios::binary | ios::app);
@@ -196,9 +193,9 @@ bool CompressFile(string compressPath, vector<string>filePath, int indexFileName
 
 
 				//Ghi bang tan so vao file
-				unsigned char size_frequence_table = character.size();
-				outFile.write((char*)&size_frequence_table, sizeof(unsigned char));
-
+				short int size_frequence_table = character.size();
+				outFile.write((char*)&size_frequence_table, sizeof(short int));
+	
 				if (size_frequence_table != 0)
 				{
 						outFile.write((char*)&character[0], sizeof(char) * character.size());
@@ -300,8 +297,8 @@ bool DecompressFile(string path, string decompressPath, int pos)
 						ofstream outFile(path, ios::out | ios::binary);
 
 						//Doc bang tan so
-						unsigned char size_frequence_table;
-						inFile.read((char*)&size_frequence_table, sizeof(unsigned char));
+						short int size_frequence_table;
+						inFile.read((char*)&size_frequence_table, sizeof(short int));
 
 						vector <char> character(size_frequence_table);
 						vector <int> frequence(size_frequence_table);
